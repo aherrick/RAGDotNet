@@ -22,8 +22,21 @@ var azureOpenAI = new AzureOpenAIClient(
 );
 
 var embeddingClient = azureOpenAI
-    .GetEmbeddingClient(config["AzureOpenAI:EmbeddingDeployment"])
+    .GetEmbeddingClient(
+        config["AzureOpenAI:EmbeddingDeployment"]
+            ?? throw new InvalidOperationException("Missing AzureOpenAI embedding deployment")
+    )
     .AsIEmbeddingGenerator();
+
+var chatClient = azureOpenAI
+    .GetChatClient(
+        config["AzureOpenAI:ChatDeployment"]
+            ?? throw new InvalidOperationException("Missing AzureOpenAI chat deployment")
+    )
+    .AsIChatClient()
+    .AsBuilder()
+    .UseFunctionInvocation()
+    .Build();
 
 var searchIndexClient = new SearchIndexClient(
     new Uri(
@@ -82,13 +95,6 @@ ChatOptions chatOptions = new() { Tools = [AIFunctionFactory.Create(SearchAsync)
 List<ChatMessage> messages = [];
 messages.Add(new(ChatRole.System, SystemPrompt));
 
-var chatClient = azureOpenAI
-    .GetChatClient("gpt-4o-mini")
-    .AsIChatClient()
-    .AsBuilder()
-    .UseFunctionInvocation()
-    .Build();
-
 while (true)
 {
     Console.WriteLine();
@@ -97,7 +103,9 @@ while (true)
     var input = Console.ReadLine();
 
     if (string.Equals(input, "exit", StringComparison.OrdinalIgnoreCase))
+    {
         break;
+    }
 
     messages.Add(new ChatMessage(ChatRole.User, input));
 

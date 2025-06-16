@@ -21,7 +21,8 @@ Example secrets.json structure:
   "AzureOpenAI": {
     "Endpoint": "https://your-openai-url-here/",
     "Key": "your-openai-key-here",
-    "EmbeddingDeployment": "text-embedding-3-small"
+    "EmbeddingDeployment": "text-embedding-3-small",
+    "ChatDeployment": "gpt-4o-mini"
   },
   "AzureAISearch": {
     "Endpoint": "https://your-search-url-here/",
